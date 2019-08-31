@@ -8,7 +8,6 @@ inputs:
   config:
     description: 'Path of the Revive config file'
     required: false
-    default: 'revive.toml'
 runs:
   using: 'docker'
   image: 'Dockerfile'
