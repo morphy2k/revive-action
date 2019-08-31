@@ -11,7 +11,7 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Run Revive Action
-      uses: morphy2k/revive-action@v1
+      uses: morphy2k/revive-action@feature/pre-build
       with:
         config: revive.toml
       env:
