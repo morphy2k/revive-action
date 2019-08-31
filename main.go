@@ -17,20 +17,18 @@ import (
 const name = "Revive Action"
 
 const (
-	envRepo   = "GITHUB_REPOSITORY"
-	envAction = "GITHUB_ACTION"
-	envSHA    = "GITHUB_SHA"
-	envToken  = "GITHUB_TOKEN"
+	envRepo  = "GITHUB_REPOSITORY"
+	envSHA   = "GITHUB_SHA"
+	envToken = "GITHUB_TOKEN"
 
 	chunkLimit = 50
 )
 
 var (
-	ghToken    string
-	repoOwner  string
-	repoName   string
-	headSHA    string
-	actionName string
+	ghToken   string
+	repoOwner string
+	repoName  string
+	headSHA   string
 )
 
 var client *github.Client
@@ -55,13 +53,6 @@ func init() {
 		headSHA = env
 	} else {
 		fmt.Fprintln(os.Stderr, "Missing environment variable:", envSHA)
-		os.Exit(2)
-	}
-
-	if env := os.Getenv(envAction); len(env) > 0 {
-		actionName = env
-	} else {
-		fmt.Fprintln(os.Stderr, "Missing environment variable:", envAction)
 		os.Exit(2)
 	}
 
@@ -188,7 +179,8 @@ func pushFailures(check *github.CheckRun, failures []*failure, total int, wg *sy
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
 	defer cancel()
 
-	if _, _, err := client.Checks.UpdateCheckRun(ctx, repoOwner, repoName, check.GetID(), opts); err != nil {
+	if _, _, err := client.Checks.UpdateCheckRun(
+		ctx, repoOwner, repoName, check.GetID(), opts); err != nil {
 		fmt.Fprintln(os.Stderr, "Error while updating check-run:", err)
 		os.Exit(1)
 	}
@@ -245,8 +237,7 @@ func main() {
 
 	completeCheck(check, concl)
 
-	fmt.Fprintf(os.Stderr,
-		"Successful run with %d failures (%d warnings, %d errors)\n",
+	fmt.Printf("Successful run with %d failures (%d warnings, %d errors)\n",
 		totalCount, warnCount, errCount)
 	os.Exit(exitCode)
 }
