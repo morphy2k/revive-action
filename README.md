@@ -8,7 +8,7 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
   uses: actions/checkout@v1
 
 - name: Run Revive Action
-  use: morphy2k/revive-action@v1
+  uses: morphy2k/revive-action@v1
   with:
     # Path to your Revive config within the repo (default: revive.toml)
     config: revive/config.toml
