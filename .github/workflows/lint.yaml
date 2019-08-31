@@ -12,5 +12,7 @@ jobs:
 
     - name: Run Revive Action
       uses: morphy2k/revive-action@master
+      with:
+        config: revive.toml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
