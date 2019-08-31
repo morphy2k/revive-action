@@ -13,6 +13,6 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
     # Path to your Revive config within the repo (optional)
     config: revive/config.toml
   env:
-    # GitHub token needed if you want to use annotations
+    # GitHub token for annotations (optional)
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
