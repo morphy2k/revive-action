@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
-      - name: Check out code into the Go module directory
-        uses: actions/checkout@v1
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v1
 
-      - name: Run Revive Action
-        use: morphy2k/revive-action@master
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Run Revive Action
+      uses: morphy2k/revive-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
