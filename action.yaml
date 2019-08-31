@@ -1,0 +1,14 @@
+name: 'Revive Action'
+description: 'Lint your Go code with Revive'
+author: 'Markus Wiegand'
+branding:
+  icon: 'code'
+  color: 'blue'
+inputs:
+  config:
+    description: 'Path of the Revive config file'
+    required: false
+    default: 'revive.toml'
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
