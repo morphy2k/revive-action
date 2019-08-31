@@ -93,11 +93,15 @@ func (c conclusion) String() string {
 	return [...]string{"success", "failure"}[c]
 }
 
-func completeCheck(check *github.CheckRun, concl conclusion) {
+func completeCheck(check *github.CheckRun, concl conclusion, stats *failureStats) {
 	opts := github.UpdateCheckRunOptions{
 		Name:       name,
 		HeadSHA:    github.String(headSHA),
 		Conclusion: github.String(concl.String()),
+		Output: &github.CheckRunOutput{
+			Title:   github.String("Result"),
+			Summary: github.String(stats.String()),
+		},
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
@@ -122,6 +126,15 @@ type failure struct {
 type failurePosition struct {
 	Start token.Position
 	End   token.Position
+}
+
+type failureStats struct {
+	Total, Warnings, Errors int
+}
+
+func (f failureStats) String() string {
+	return fmt.Sprintf("%d failures (%d warnings, %d errors)",
+		f.Total, f.Warnings, f.Errors)
 }
 
 func getFailures(ch chan *failure) {
@@ -150,6 +163,7 @@ func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
 		case "error":
 			level = "failure"
 		}
+
 		ann[i] = &github.CheckRunAnnotation{
 			Path:            github.String(f.Position.Start.Filename),
 			StartLine:       github.Int(f.Position.Start.Line),
@@ -165,13 +179,13 @@ func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
 	return ann
 }
 
-func pushFailures(check *github.CheckRun, failures []*failure, total int, wg *sync.WaitGroup) {
+func pushFailures(check *github.CheckRun, failures []*failure, stats *failureStats, wg *sync.WaitGroup) {
 	opts := github.UpdateCheckRunOptions{
 		Name:    name,
 		HeadSHA: github.String(headSHA),
 		Output: &github.CheckRunOutput{
 			Title:       github.String("Result"),
-			Summary:     github.String(fmt.Sprintf("%d failures", total)),
+			Summary:     github.String(stats.String()),
 			Annotations: createAnnotations(failures),
 		},
 	}
@@ -190,54 +204,52 @@ func pushFailures(check *github.CheckRun, failures []*failure, total int, wg *sy
 
 func main() {
 	var exitCode int
-	var totalCount int
 	var concl conclusion
 
 	check := createCheck()
 
 	failures := make([]*failure, 0)
+	stats := &failureStats{}
 
 	ch := make(chan *failure)
 	go getFailures(ch)
 
 	wg := &sync.WaitGroup{}
 
-	warnCount, errCount := 0, 0
 	chunks := 1
 	for f := range ch {
 		failures = append(failures, f)
 
-		totalCount++
+		stats.Total++
 
 		switch f.Severity {
 		case "warning":
-			warnCount++
+			stats.Warnings++
 		case "error":
-			errCount++
+			stats.Errors++
 		}
 
-		if c := chunks * chunkLimit; totalCount > c {
+		if c := chunks * chunkLimit; stats.Total > c {
 			wg.Add(1)
-			go pushFailures(check, failures[c-chunkLimit:c], totalCount, wg)
+			go pushFailures(check, failures[c-chunkLimit:c], stats, wg)
 			chunks++
 		}
 	}
 
-	if totalCount > 0 {
+	if stats.Total > 0 {
 		wg.Add(1)
 		if chunks == 1 {
-			go pushFailures(check, failures, totalCount, wg)
+			go pushFailures(check, failures, stats, wg)
 		} else {
 			c := chunks * chunkLimit
-			go pushFailures(check, failures[c-chunkLimit:], totalCount, wg)
+			go pushFailures(check, failures[c-chunkLimit:], stats, wg)
 		}
 		wg.Wait()
 		exitCode, concl = 1, conclFailure
 	}
 
-	completeCheck(check, concl)
+	completeCheck(check, concl, stats)
 
-	fmt.Printf("Successful run with %d failures (%d warnings, %d errors)\n",
-		totalCount, warnCount, errCount)
+	fmt.Println("Successful run with", stats.String())
 	os.Exit(exitCode)
 }
