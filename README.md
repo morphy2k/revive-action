@@ -10,7 +10,7 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
 - name: Run Revive Action
   uses: morphy2k/revive-action@v1
   with:
-    # Path to your Revive config within the repo (default: revive.toml)
+    # Path to your Revive config within the repo (optional)
     config: revive/config.toml
   env:
     # GitHub token needed if you want to use annotations
