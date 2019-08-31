@@ -1,6 +1,5 @@
 FROM golang:1.12
 
-LABEL version="1.0.1"
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
 LABEL maintainer="Markus Wiegand <mail@morphy2k.io>"
