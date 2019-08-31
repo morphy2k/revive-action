@@ -14,6 +14,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
+const name = "Revive Action"
+
 const (
 	envRepo   = "GITHUB_REPOSITORY"
 	envAction = "GITHUB_ACTION"
@@ -72,7 +74,7 @@ func init() {
 
 func createCheck() *github.CheckRun {
 	opts := github.CreateCheckRunOptions{
-		Name:    actionName,
+		Name:    name,
 		HeadSHA: headSHA,
 		Status:  github.String("in_progress"),
 	}
@@ -102,7 +104,7 @@ func (c conclusion) String() string {
 
 func completeCheck(check *github.CheckRun, concl conclusion) {
 	opts := github.UpdateCheckRunOptions{
-		Name:       actionName,
+		Name:       name,
 		HeadSHA:    github.String(headSHA),
 		Conclusion: github.String(concl.String()),
 	}
@@ -174,7 +176,7 @@ func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
 
 func pushFailures(check *github.CheckRun, failures []*failure, total int, wg *sync.WaitGroup) {
 	opts := github.UpdateCheckRunOptions{
-		Name:    actionName,
+		Name:    name,
 		HeadSHA: github.String(headSHA),
 		Output: &github.CheckRunOutput{
 			Title:       github.String("Result"),
