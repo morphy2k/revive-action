@@ -14,7 +14,7 @@ jobs:
       - name: Login to Registry
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | \
-          docker login docker.pkg.github.com -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
+          docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
       - name: Check out code into the Go module directory
         uses: actions/checkout@v1
@@ -22,14 +22,16 @@ jobs:
       - name: Build image
         run: |
           export IMAGE_TAG=$(echo ${GITHUB_REF} | sed -e "s/refs\/tags\///g")
-          export IMAGE_TAG_MAJOR=$(echo ${IMAGE_TAG} | cut -d "." -f1)
+          export IMAGE_TAG_MINOR=$(echo ${IMAGE_TAG} | awk '{match($0,"v[0-9]\.[0-9]",a)}END{print a[0]}')
+          export IMAGE_TAG_MAJOR=$(echo ${IMAGE_TAG} | awk '{match($0,"v[0-9]",a)}END{print a[0]}')
           docker build \
-          -t docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action \
-          -t docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action:${IMAGE_TAG_MAJOR} \
-          -t docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action:${IMAGE_TAG} .
+          -t morphy/revive-action \
+          -t morphy/revive-action:${IMAGE_TAG} \
+          -t morphy/revive-action:${IMAGE_TAG_MINOR} \
+          -t morphy/revive-action:${IMAGE_TAG_MAJOR} .
 
       - name: Publish image
-        run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action
+        run: docker push morphy/revive-action
 
       - name: Logout
-        run: docker logout docker.pkg.github.com
+        run: docker logout
