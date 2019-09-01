@@ -10,12 +10,12 @@ Checkout
 - name: Check out code into the Go module directory
   uses: actions/checkout@v1
 ```
-Building from repository
+Use by building from repository
 ```YAML
 - name: Run Revive Action by building from repository
   uses: morphy2k/revive-action@v1
 ```
-Pulling pre-built image
+Use by pulling pre-built image *(faster execution time)*
 ```YAML
 - name: Run Revive Action by pulling pre-built image
   uses: docker://morphy/revive-action:v1
