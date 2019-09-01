@@ -12,6 +12,8 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
   with:
     # Path to your Revive config within the repo (optional)
     config: revive/config.toml
+    # Exclude patterns, separated by semicolons (optional)
+    exclude: "file.go;foo/bar.go;./foo/bar/..."
   env:
     # GitHub token for annotations (optional)
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
