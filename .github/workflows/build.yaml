@@ -1,0 +1,31 @@
+name: Build
+on: release
+jobs:
+
+  build:
+    name: Build image
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Login to Registry
+        run: |
+          echo ${{ secrets.GITHUB_TOKEN }} | \
+          docker login docker.pkg.github.com -u morphy2k --password-stdin
+
+      - name: Check out code into the Go module directory
+        uses: actions/checkout@v1
+
+      - name: Build image
+        run: |
+          export IMAGE_TAG=$(echo ${GITHUB_REF} | sed -e "s/refs\/tags\///g")
+          export IMAGE_TAG_MAJOR=$(echo ${IMAGE_TAG} | cut -d "." -f1)
+          docker build \
+          -t docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action \
+          -t docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action:${IMAGE_TAG_MAJOR} \
+          -t docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action:${IMAGE_TAG} .
+
+      - name: Publish image
+        run: docker push docker.pkg.github.com/${GITHUB_REPOSITORY}/revive-action
+
+      - name: Logout
+        run: docker logout docker.pkg.github.com
