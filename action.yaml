@@ -8,6 +8,9 @@ inputs:
   config:
     description: 'Path of the Revive config file'
     required: false
+  exclude:
+    description: 'Revive exclude patterns, separated by semicolons'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
