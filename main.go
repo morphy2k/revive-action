@@ -170,7 +170,7 @@ func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
 			EndLine:         github.Int(f.Position.End.Line),
 			AnnotationLevel: github.String(level),
 			Title: github.String(
-				fmt.Sprintf("%s (%s)", strings.Title(f.RuleName), f.RuleName),
+				fmt.Sprintf("%s (%s)", strings.Title(f.Category), f.RuleName),
 			),
 			Message: github.String(f.Failure),
 		}
