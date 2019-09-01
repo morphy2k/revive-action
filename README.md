@@ -16,7 +16,7 @@ Building from repository
 Pulling pre-built image
 ```YAML
 - name: Run Revive Action by pulling pre-built image
-  uses: docker.pkg.github.com/revive-action/revive-action:v1
+  uses: docker://morphy/revive-action:v1
 ```
 Configuration
 ```YAML
