@@ -7,6 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+      - name: Check if it's a release publish # workaround has `on` doesn't have this filter
+        if: github.event.action != 'published'
+        run: exit 78
+
       - name: Login to Registry
         run: |
           echo ${{ secrets.DOCKER_PASSWORD }} | \
