@@ -31,3 +31,9 @@ Configuration
     # GitHub token for annotations (optional)
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 ```
+
+## Screenshots
+
+GitHub Annotations
+
+![Screenshot of annotations](screenshot.png)
