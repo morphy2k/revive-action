@@ -3,12 +3,23 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
 
 ## Usage
 
+Checkout
 ```YAML
 - name: Check out code into the Go module directory
   uses: actions/checkout@v1
-
-- name: Run Revive Action
+```
+Building from repository
+```YAML
+- name: Run Revive Action by building from repository
   uses: morphy2k/revive-action@v1
+```
+Pulling pre-built image
+```YAML
+- name: Run Revive Action by pulling pre-built image
+  uses: docker://morphy/revive-action:v1
+```
+Configuration
+```YAML
   with:
     # Path to your Revive config within the repo (optional)
     config: revive/config.toml
