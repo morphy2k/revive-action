@@ -1,5 +1,13 @@
 name: Lint
-on: push
+on:
+  push:
+    paths:
+      - '*.go'
+      - 'revive.toml'
+      - '.github/workflows/lint.yaml'
+    tags:
+      - '!refs/tags/*'
+
 jobs:
 
   lint:
