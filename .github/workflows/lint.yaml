@@ -5,8 +5,6 @@ on:
       - '*.go'
       - 'revive.toml'
       - '.github/workflows/lint.yaml'
-    tags:
-      - '!refs/tags/*'
 
 jobs:
 
@@ -19,7 +17,7 @@ jobs:
       uses: actions/checkout@v1
 
     - name: Run Revive Action
-      uses: docker://morphy/revive-action:v1
+      uses: morphy2k/revive-action@v1
       with:
         config: revive.toml
       env:
