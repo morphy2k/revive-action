@@ -15,7 +15,7 @@ Use by building from repository
 - name: Run Revive Action by building from repository
   uses: morphy2k/revive-action@v1
 ```
-Use by pulling pre-built image *(faster execution time)*
+Use by pulling pre-built image *(faster execution time, less secure)*
 ```YAML
 - name: Run Revive Action by pulling pre-built image
   uses: docker://morphy/revive-action:v1
@@ -34,6 +34,6 @@ Configuration
 
 ## Screenshots
 
-GitHub Annotations
-
 ![Screenshot of annotations](screenshot.png)
+
+*GitHub Annotations*
