@@ -11,6 +11,9 @@ inputs:
   exclude:
     description: 'Revive exclude patterns, separated by semicolons'
     required: false
+  path:
+    description: 'Revive path pattern'
+    required: false
 runs:
   using: 'docker'
   image: 'Dockerfile'
