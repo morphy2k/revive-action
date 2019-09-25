@@ -27,6 +27,8 @@ Configuration
     config: revive/config.toml
     # Exclude patterns, separated by semicolons (optional)
     exclude: "file.go;foo/bar.go;./foo/bar/..."
+    # Path pattern (default: ./...)
+    path: "./foo/..."
   env:
     # GitHub token for annotations (optional)
     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
