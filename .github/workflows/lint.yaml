@@ -2,7 +2,7 @@ name: Lint
 on:
   push:
     paths:
-      - '*.go'
+      - '**.go'
       - 'revive.toml'
       - '.github/workflows/lint.yaml'
 
@@ -13,6 +13,11 @@ jobs:
     runs-on: ubuntu-latest
     steps:
 
+    - name: Set up Go
+      uses: actions/setup-go@v1
+      with:
+        go-version: '1.13'
+
     - name: Check out code into the Go module directory
       uses: actions/checkout@v1
 
@@ -22,3 +27,6 @@ jobs:
         config: revive.toml
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+    - name: Check formatting
+      run: test -z $(gofmt -l .) || (gofmt -l . && exit 1)
