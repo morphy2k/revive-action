@@ -203,7 +203,6 @@ func pushFailures(check *github.CheckRun, failures []*failure, stats *failureSta
 }
 
 func main() {
-	var exitCode int
 	var concl conclusion
 
 	check := createCheck()
@@ -245,11 +244,10 @@ func main() {
 			go pushFailures(check, failures[c-chunkLimit:], stats, wg)
 		}
 		wg.Wait()
-		exitCode, concl = 1, conclFailure
+		concl = conclFailure
 	}
 
 	completeCheck(check, concl, stats)
 
 	fmt.Println("Successful run with", stats.String())
-	os.Exit(exitCode)
 }
