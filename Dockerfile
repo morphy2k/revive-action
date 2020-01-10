@@ -1,4 +1,4 @@
-FROM golang:1.13
+FROM golang:1.13.6
 
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
@@ -11,7 +11,7 @@ LABEL com.github.actions.color="blue"
 
 ENV GO111MODULE=on
 
-RUN go get -v github.com/mgechev/revive
+RUN go get -v github.com/mgechev/revive@v1
 RUN go get -v github.com/morphy2k/revive-action
 
 COPY entrypoint.sh /entrypoint.sh
