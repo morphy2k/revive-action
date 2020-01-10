@@ -9,6 +9,8 @@ LABEL com.github.actions.description="Lint your Go code with Revive"
 LABEL com.github.actions.icon="code"
 LABEL com.github.actions.color="blue"
 
+ENV GO111MODULE=on
+
 RUN go get -v github.com/mgechev/revive
 RUN go get -v github.com/morphy2k/revive-action
 
