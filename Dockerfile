@@ -1,4 +1,4 @@
-FROM golang:1.13.8
+FROM golang:1.14.2
 
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
