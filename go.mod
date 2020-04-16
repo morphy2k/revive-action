@@ -1,6 +1,6 @@
 module github.com/morphy2k/revive-action
 
-go 1.13
+go 1.14
 
 require (
 	github.com/google/go-github/v29 v29.0.2
