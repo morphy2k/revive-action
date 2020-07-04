@@ -1,5 +1,3 @@
-[![Dependabot status](https://api.dependabot.com/badges/status?host=github&repo=morphy2k/revive-action)](https://dependabot.com/)
-
 # Revive Action
 This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https://golang.org/) code and adds optional annotations to the check.
 
