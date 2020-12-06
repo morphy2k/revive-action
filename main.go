@@ -166,7 +166,9 @@ func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
 		ann[i] = &github.CheckRunAnnotation{
 			Path:            github.String(f.Position.Start.Filename),
 			StartLine:       github.Int(f.Position.Start.Line),
+			StartColumn:     github.Int(f.Position.Start.Column),
 			EndLine:         github.Int(f.Position.End.Line),
+			EndColumn:       github.Int(f.Position.End.Column),
 			AnnotationLevel: github.String(level),
 			Title: github.String(
 				fmt.Sprintf("%s (%s)", strings.Title(f.Category), f.RuleName),
