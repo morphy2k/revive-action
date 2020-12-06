@@ -1,19 +1,22 @@
-name: 'Revive Action'
-description: 'Lint your Go code with Revive'
-author: 'Markus Wiegand'
+name: "Revive Action"
+description: "Lint your Go code with Revive"
+author: "Markus Wiegand"
 branding:
-  icon: 'code'
-  color: 'blue'
+    icon: "code"
+    color: "blue"
 inputs:
-  config:
-    description: 'Path of the Revive config file'
-    required: false
-  exclude:
-    description: 'Revive exclude patterns, separated by semicolons'
-    required: false
-  path:
-    description: 'Revive path pattern'
-    required: false
+    config:
+        description: "Path of the Revive config file"
+        required: false
+    exclude:
+        description: "Revive exclude patterns, separated by semicolons"
+        required: false
+    path:
+        description: "Revive path pattern"
+        required: false
+    name:
+        description: "Display name of the check"
+        required: false
 runs:
-  using: 'docker'
-  image: 'Dockerfile'
+    using: "docker"
+    image: "Dockerfile"

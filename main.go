@@ -14,9 +14,8 @@ import (
 	"golang.org/x/oauth2"
 )
 
-const name = "Revive Action"
-
 const (
+	envName  = "CHECK_NAME"
 	envRepo  = "GITHUB_REPOSITORY"
 	envSHA   = "GITHUB_SHA"
 	envToken = "GITHUB_TOKEN"
@@ -25,6 +24,7 @@ const (
 )
 
 var (
+	name      string
 	ghToken   string
 	repoOwner string
 	repoName  string
@@ -34,6 +34,13 @@ var (
 var client *github.Client
 
 func init() {
+	if env := os.Getenv(envName); len(env) > 0 {
+		name = env
+	} else {
+		fmt.Fprintln(os.Stderr, "Missing environment variable:", envName)
+		os.Exit(2)
+	}
+
 	if env := os.Getenv(envToken); len(env) > 0 {
 		ghToken = env
 	} else {

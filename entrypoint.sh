@@ -4,6 +4,10 @@ set -e
 
 cd "$GITHUB_WORKSPACE"
 
+CHECK_NAME="revive-action"
+
+if [ ! -z "${INPUT_NAME}" ]; then CHECK_NAME=$INPUT_NAME; fi
+
 LINT_PATH="./..."
 
 if [ ! -z "${INPUT_PATH}" ]; then LINT_PATH=$INPUT_PATH; fi
