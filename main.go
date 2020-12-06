@@ -10,7 +10,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/google/go-github/v31/github"
+	"github.com/google/go-github/v33/github"
 	"golang.org/x/oauth2"
 )
 
@@ -96,7 +96,6 @@ func (c conclusion) String() string {
 func completeCheck(check *github.CheckRun, concl conclusion, stats *failureStats) {
 	opts := github.UpdateCheckRunOptions{
 		Name:       name,
-		HeadSHA:    github.String(headSHA),
 		Conclusion: github.String(concl.String()),
 		Output: &github.CheckRunOutput{
 			Title:   github.String("Result"),
@@ -181,8 +180,7 @@ func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
 
 func pushFailures(check *github.CheckRun, failures []*failure, stats *failureStats, wg *sync.WaitGroup) {
 	opts := github.UpdateCheckRunOptions{
-		Name:    name,
-		HeadSHA: github.String(headSHA),
+		Name: name,
 		Output: &github.CheckRunOutput{
 			Title:       github.String("Result"),
 			Summary:     github.String(stats.String()),
