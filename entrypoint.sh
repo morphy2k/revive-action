@@ -4,9 +4,12 @@ set -e
 
 cd "$GITHUB_WORKSPACE"
 
-CHECK_NAME="revive-action"
-
-if [ ! -z "${INPUT_NAME}" ]; then CHECK_NAME=$INPUT_NAME; fi
+if [ ! -z "${INPUT_NAME}" ]; 
+then
+  export CHECK_NAME=$INPUT_NAME;
+else
+  export CHECK_NAME="revive-action"
+fi
 
 LINT_PATH="./..."
 
