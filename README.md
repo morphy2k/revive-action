@@ -35,7 +35,7 @@ Configuration
     exclude: "file.go;foo/bar.go;./foo/bar/..."
     # Path pattern (default: ./...)
     path: "./foo/..."
-    # Name of the ckeck (default: revive-action)
+    # Name of the check (default: revive-action)
     name: "Revive"
   env:
     # GitHub token for annotations (optional)
