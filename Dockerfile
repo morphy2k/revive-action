@@ -1,6 +1,7 @@
 FROM golang:1.15.6 as build-env
 
 ENV GO111MODULE=on
+ENV CGO_ENABLED=0
 
 RUN go get -v github.com/mgechev/revive@v1
 
