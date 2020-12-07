@@ -8,7 +8,7 @@ Checkout
 
 ```YAML
 - name: Check out code into the Go module directory
-  uses: actions/checkout@v1
+  uses: actions/checkout@v2
 ```
 
 Use by building from repository
