@@ -159,7 +159,7 @@ func getFailures(ch chan *failure) {
 }
 
 func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
-	annoations := make([]*github.CheckRunAnnotation, len(failures))
+	annotations := make([]*github.CheckRunAnnotation, len(failures))
 
 	for i, f := range failures {
 		var level string
@@ -186,10 +186,10 @@ func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
 			a.EndColumn = github.Int(f.Position.End.Column)
 		}
 
-		annoations[i] = a
+		annotations[i] = a
 	}
 
-	return annoations
+	return annotations
 }
 
 func pushFailures(check *github.CheckRun, failures []*failure, stats *failureStats, wg *sync.WaitGroup) {
