@@ -10,7 +10,7 @@ COPY . .
 
 RUN go install
 
-FROM alpine:3.12
+FROM alpine:3.13.0
 
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
