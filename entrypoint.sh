@@ -16,4 +16,4 @@ done
 
 if [ ! -z "${INPUT_CONFIG}" ]; then CONFIG="-config=$INPUT_CONFIG"; fi
 
-sh -c "revive $CONFIG $EXCLUDES -formatter ndjson $LINT_PATH | revive-action"
+eval "revive $CONFIG $EXCLUDES -formatter ndjson $LINT_PATH | revive-action"
