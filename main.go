@@ -1,123 +1,12 @@
 package main
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"go/token"
 	"os"
-	"strings"
 	"sync"
-	"time"
-
-	"github.com/google/go-github/v33/github"
-	"golang.org/x/oauth2"
 )
-
-const (
-	envName  = "CHECK_NAME"
-	envRepo  = "GITHUB_REPOSITORY"
-	envSHA   = "GITHUB_SHA"
-	envToken = "GITHUB_TOKEN"
-
-	chunkLimit = 50
-)
-
-var (
-	name      string
-	ghToken   string
-	repoOwner string
-	repoName  string
-	headSHA   string
-)
-
-var client *github.Client
-
-func init() {
-	if env := os.Getenv(envName); len(env) > 0 {
-		name = env
-	} else {
-		name = "revive-action"
-	}
-
-	if env := os.Getenv(envToken); len(env) > 0 {
-		ghToken = env
-	} else {
-		fmt.Fprintln(os.Stderr, "Missing environment variable:", envToken)
-		os.Exit(2)
-	}
-
-	if env := os.Getenv(envRepo); len(env) > 0 {
-		s := strings.SplitN(env, "/", 2)
-		repoOwner, repoName = s[0], s[1]
-	} else {
-		fmt.Fprintln(os.Stderr, "Missing environment variable:", envRepo)
-		os.Exit(2)
-	}
-
-	if env := os.Getenv(envSHA); len(env) > 0 {
-		headSHA = env
-	} else {
-		fmt.Fprintln(os.Stderr, "Missing environment variable:", envSHA)
-		os.Exit(2)
-	}
-
-	tc := oauth2.NewClient(context.Background(), oauth2.StaticTokenSource(
-		&oauth2.Token{AccessToken: ghToken},
-	))
-
-	client = github.NewClient(tc)
-}
-
-func createCheck() *github.CheckRun {
-	opts := github.CreateCheckRunOptions{
-		Name:    name,
-		HeadSHA: headSHA,
-		Status:  github.String("in_progress"),
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	check, _, err := client.Checks.CreateCheckRun(ctx, repoOwner, repoName, opts)
-	if err != nil {
-		fmt.Fprintln(os.Stderr, "Error while creating check-run:", err)
-		os.Exit(1)
-	}
-
-	return check
-}
-
-type conclusion int
-
-const (
-	conclSuccess conclusion = iota
-	conclFailure
-)
-
-func (c conclusion) String() string {
-	return [...]string{"success", "failure"}[c]
-}
-
-func completeCheck(check *github.CheckRun, concl conclusion, stats *failureStats) {
-	opts := github.UpdateCheckRunOptions{
-		Name:       name,
-		Conclusion: github.String(concl.String()),
-		Output: &github.CheckRunOutput{
-			Title:   github.String("Result"),
-			Summary: github.String(stats.String()),
-		},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if _, _, err := client.Checks.UpdateCheckRun(
-		ctx, repoOwner, repoName, check.GetID(), opts); err != nil {
-		fmt.Fprintln(os.Stderr, "Error while completing check-run:", err)
-		os.Exit(1)
-	}
-}
 
 type failure struct {
 	Failure    string
@@ -157,68 +46,18 @@ func getFailures(ch chan *failure) {
 	close(ch)
 }
 
-func createAnnotations(failures []*failure) []*github.CheckRunAnnotation {
-	annotations := make([]*github.CheckRunAnnotation, len(failures))
+func printCommand(f *failure) {
+	s := fmt.Sprintf("file=%s,line=%d,col=%d::%s\n",
+		f.Position.Start.Filename, f.Position.Start.Line, f.Position.Start.Column, f.Failure)
 
-	for i, f := range failures {
-		var level string
-		switch f.Severity {
-		case "warning":
-			level = "warning"
-		case "error":
-			level = "failure"
-		}
-
-		a := &github.CheckRunAnnotation{
-			Path:            github.String(f.Position.Start.Filename),
-			StartLine:       github.Int(f.Position.Start.Line),
-			EndLine:         github.Int(f.Position.End.Line),
-			AnnotationLevel: github.String(level),
-			Title: github.String(
-				fmt.Sprintf("%s (%s)", strings.Title(f.Category), f.RuleName),
-			),
-			Message: github.String(f.Failure),
-		}
-
-		if f.Position.Start.Line == f.Position.End.Line {
-			a.StartColumn = github.Int(f.Position.Start.Column)
-			a.EndColumn = github.Int(f.Position.End.Column)
-		}
-
-		annotations[i] = a
+	if f.Severity == "warning" {
+		fmt.Printf("::warning %s", s)
+	} else {
+		fmt.Printf("::error %s", s)
 	}
-
-	return annotations
-}
-
-func pushFailures(check *github.CheckRun, failures []*failure, stats *failureStats, wg *sync.WaitGroup) {
-	opts := github.UpdateCheckRunOptions{
-		Name: name,
-		Output: &github.CheckRunOutput{
-			Title:       github.String("Result"),
-			Summary:     github.String(stats.String()),
-			Annotations: createAnnotations(failures),
-		},
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 30*time.Second)
-	defer cancel()
-
-	if _, _, err := client.Checks.UpdateCheckRun(
-		ctx, repoOwner, repoName, check.GetID(), opts); err != nil {
-		fmt.Fprintln(os.Stderr, "Error while updating check-run:", err)
-		os.Exit(1)
-	}
-
-	wg.Done()
 }
 
 func main() {
-	var concl conclusion
-
-	check := createCheck()
-
-	failures := make([]*failure, 0)
 	stats := &failureStats{}
 
 	ch := make(chan *failure)
@@ -226,9 +65,8 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 
-	chunks := 1
 	for f := range ch {
-		failures = append(failures, f)
+		wg.Add(1)
 
 		stats.Total++
 
@@ -239,26 +77,10 @@ func main() {
 			stats.Errors++
 		}
 
-		if c := chunks * chunkLimit; stats.Total > c {
-			wg.Add(1)
-			go pushFailures(check, failures[c-chunkLimit:c], stats, wg)
-			chunks++
-		}
+		go printCommand(f)
 	}
 
-	if stats.Total > 0 {
-		wg.Add(1)
-		if chunks == 1 {
-			go pushFailures(check, failures, stats, wg)
-		} else {
-			c := chunks * chunkLimit
-			go pushFailures(check, failures[c-chunkLimit:], stats, wg)
-		}
-		wg.Wait()
-		concl = conclFailure
-	}
-
-	completeCheck(check, concl, stats)
+	wg.Wait()
 
 	fmt.Println("Successful run with", stats.String())
 }
