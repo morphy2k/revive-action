@@ -46,7 +46,7 @@ func getFailures(ch chan *failure) {
 	close(ch)
 }
 
-func printCommand(f *failure) {
+func printCommand(f *failure, wg *sync.WaitGroup) {
 	s := fmt.Sprintf("file=%s,line=%d,col=%d::%s\n",
 		f.Position.Start.Filename, f.Position.Start.Line, f.Position.Start.Column, f.Failure)
 
@@ -55,6 +55,8 @@ func printCommand(f *failure) {
 	} else {
 		fmt.Printf("::error %s", s)
 	}
+
+	wg.Done()
 }
 
 func main() {
@@ -77,7 +79,7 @@ func main() {
 			stats.Errors++
 		}
 
-		go printCommand(f)
+		go printCommand(f, wg)
 	}
 
 	wg.Wait()
