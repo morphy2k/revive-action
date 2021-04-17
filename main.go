@@ -12,21 +12,21 @@ type failure struct {
 	Failure    string
 	RuleName   string
 	Category   string
-	Position   failurePosition
+	Position   position
 	Confidence float64
 	Severity   string
 }
 
-type failurePosition struct {
+type position struct {
 	Start token.Position
 	End   token.Position
 }
 
-type failureStats struct {
+type statistics struct {
 	Total, Warnings, Errors int
 }
 
-func (f failureStats) String() string {
+func (f statistics) String() string {
 	return fmt.Sprintf("%d failures (%d warnings, %d errors)",
 		f.Total, f.Warnings, f.Errors)
 }
@@ -46,7 +46,7 @@ func getFailures(ch chan *failure) {
 	close(ch)
 }
 
-func printCommand(f *failure, wg *sync.WaitGroup) {
+func printFailure(f *failure, wg *sync.WaitGroup) {
 	s := fmt.Sprintf("file=%s,line=%d,col=%d::%s\n",
 		f.Position.Start.Filename, f.Position.Start.Line, f.Position.Start.Column, f.Failure)
 
@@ -60,7 +60,7 @@ func printCommand(f *failure, wg *sync.WaitGroup) {
 }
 
 func main() {
-	stats := &failureStats{}
+	stats := &statistics{}
 
 	ch := make(chan *failure)
 	go getFailures(ch)
@@ -79,7 +79,7 @@ func main() {
 			stats.Errors++
 		}
 
-		go printCommand(f, wg)
+		go printFailure(f, wg)
 	}
 
 	wg.Wait()
