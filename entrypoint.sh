@@ -1,15 +1,9 @@
 #!/bin/bash
 
 set -e
+set -o pipefail
 
 cd "$GITHUB_WORKSPACE"
-
-if [ ! -z "${INPUT_NAME}" ]; 
-then
-  export CHECK_NAME=$INPUT_NAME;
-else
-  export CHECK_NAME="revive-action"
-fi
 
 LINT_PATH="./..."
 
@@ -22,10 +16,4 @@ done
 
 if [ ! -z "${INPUT_CONFIG}" ]; then CONFIG="-config=$INPUT_CONFIG"; fi
 
-if [ ! -z "${GITHUB_TOKEN}" ];
-then
-  sh -c "revive $CONFIG $EXCLUDES -formatter ndjson $LINT_PATH | revive-action"
-else
-  echo "Annotations inactive. No GitHub token provided"
-  sh -c "revive $CONFIG $EXCLUDES -formatter friendly $LINT_PATH"
-fi
+eval "revive $CONFIG $EXCLUDES -formatter ndjson $LINT_PATH | revive-action"

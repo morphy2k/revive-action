@@ -14,9 +14,6 @@ inputs:
     path:
         description: "Revive path pattern"
         required: false
-    name:
-        description: "Display name of the check"
-        required: false
 runs:
     using: "docker"
     image: "Dockerfile"
