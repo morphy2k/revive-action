@@ -30,7 +30,7 @@ jobs:
           -t morphy/revive-action:${IMAGE_TAG_MAJOR} .
 
       - name: Publish image
-        run: docker push morphy/revive-action
+        run: docker push --all-tags morphy/revive-action
 
       - name: Logout
         run: docker logout
