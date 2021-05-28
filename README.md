@@ -11,18 +11,18 @@ Checkout
   uses: actions/checkout@v2
 ```
 
+Use by pulling pre-built image **(recommended)**
+
+```YAML
+- name: Run Revive Action by pulling pre-built image
+  uses: docker://morphy/revive-action:v2
+```
+
 Use by building from repository
 
 ```YAML
 - name: Run Revive Action by building from repository
   uses: morphy2k/revive-action@v2
-```
-
-Use by pulling pre-built image
-
-```YAML
-- name: Run Revive Action by pulling pre-built image
-  uses: docker://morphy/revive-action:v2
 ```
 
 Configuration
