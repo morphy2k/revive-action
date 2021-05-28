@@ -2,11 +2,14 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"go/token"
 	"os"
 	"sync"
 )
+
+var version = "unknown"
 
 type failure struct {
 	Failure    string
@@ -60,6 +63,14 @@ func printFailure(f *failure, wg *sync.WaitGroup) {
 }
 
 func main() {
+	printVersion := flag.Bool("version", false, "Print version")
+	flag.Parse()
+
+	if *printVersion {
+		fmt.Println(version)
+		os.Exit(0)
+	}
+
 	stats := &statistics{}
 
 	ch := make(chan *failure)

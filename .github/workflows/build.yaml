@@ -20,14 +20,14 @@ jobs:
 
       - name: Build image
         run: |
-          export IMAGE_TAG=${GITHUB_REF#refs/tags/}
-          export IMAGE_TAG_MINOR=$(echo ${IMAGE_TAG} | awk '{match($0,"v[0-9].[0-9]",a)}END{print a[0]}')
-          export IMAGE_TAG_MAJOR=$(echo ${IMAGE_TAG} | awk '{match($0,"v[0-9]",a)}END{print a[0]}')
-          docker build \
+          export VERSION=${GITHUB_REF#refs/tags/}
+          export VERSION_MINOR=$(echo ${VERSION} | awk '{match($0,"v[0-9].[0-9]",a)}END{print a[0]}')
+          export VERSION_MAJOR=$(echo ${VERSION} | awk '{match($0,"v[0-9]",a)}END{print a[0]}')
+          docker build --build-arg ACTION_VERSION=${VERSION} \
           -t morphy/revive-action \
-          -t morphy/revive-action:${IMAGE_TAG} \
-          -t morphy/revive-action:${IMAGE_TAG_MINOR} \
-          -t morphy/revive-action:${IMAGE_TAG_MAJOR} .
+          -t morphy/revive-action:${VERSION} \
+          -t morphy/revive-action:${VERSION_MINOR} \
+          -t morphy/revive-action:${VERSION_MAJOR} .
 
       - name: Publish image
         run: docker push --all-tags morphy/revive-action

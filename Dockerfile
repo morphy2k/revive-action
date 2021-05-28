@@ -1,13 +1,17 @@
 FROM golang:1.16.4 as build-env
 
+ARG ACTION_VERSION
+ARG REVIVE_VERSION=v1.0.7
+
 ENV CGO_ENABLED=0
 
-RUN go get -v github.com/mgechev/revive@v1.0.7
+RUN go install -v -ldflags="-X 'main.version=${REVIVE_VERSION}'" \
+    github.com/mgechev/revive@${REVIVE_VERSION}
 
 WORKDIR /tmp/github.com/morphy2k/revive-action
 COPY . .
 
-RUN go install
+RUN go install -ldflags="-X 'main.version=${ACTION_VERSION}'"
 
 FROM alpine:3.13.5
 
@@ -23,6 +27,6 @@ LABEL com.github.actions.color="blue"
 COPY --from=build-env ["/go/bin/revive", "/go/bin/revive-action", "/bin/"]
 COPY --from=build-env /tmp/github.com/morphy2k/revive-action/entrypoint.sh /
 
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash gawk
 
 ENTRYPOINT ["/entrypoint.sh"]
