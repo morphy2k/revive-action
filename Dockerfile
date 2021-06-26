@@ -13,7 +13,7 @@ COPY . .
 
 RUN go install -ldflags="-X 'main.version=${ACTION_VERSION}'"
 
-FROM alpine:3.13.5
+FROM alpine:3.14.0
 
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
