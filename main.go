@@ -78,6 +78,8 @@ func main() {
 
 	wg := &sync.WaitGroup{}
 
+	fmt.Println("::group::Failures")
+
 	for f := range ch {
 		wg.Add(1)
 
@@ -94,6 +96,8 @@ func main() {
 	}
 
 	wg.Wait()
+
+	fmt.Println("::endgroup::")
 
 	fmt.Println("Successful run with", stats.String())
 }
