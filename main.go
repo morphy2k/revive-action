@@ -1,3 +1,4 @@
+// The Revive action binary
 package main
 
 import (
