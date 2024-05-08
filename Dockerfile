@@ -1,4 +1,4 @@
-FROM golang:1.22.0 as build-env
+FROM golang:1.22.3 as build-env
 
 ARG ACTION_VERSION=unknown
 ARG REVIVE_VERSION=v1.3.7
