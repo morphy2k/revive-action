@@ -1,4 +1,4 @@
-FROM golang:1.23.0 as build-env
+FROM golang:1.23.1 as build-env
 
 ARG ACTION_VERSION=unknown
 ARG REVIVE_VERSION=v1.4.0
@@ -13,7 +13,7 @@ COPY . .
 
 RUN go install -ldflags="-X 'main.version=${ACTION_VERSION}'"
 
-FROM golang:1.23.0-alpine
+FROM golang:1.23.1-alpine
 
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
