@@ -1,36 +1,82 @@
 name: Build
+
 on:
   release:
     types: [published]
+
+env:
+  DOCKER_HUB_IMAGE: index.docker.io/morphy/revive-action
+  GHCR_IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
 
   build:
     name: Build image
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+
     steps:
 
-      - name: Login to Registry
-        run: |
-          echo ${{ secrets.DOCKER_PASSWORD }} | \
-          docker login -u ${{ secrets.DOCKER_USERNAME }} --password-stdin
-
-      - name: Check out code into the Go module directory
+      - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Build image
-        run: |
-          export VERSION=${GITHUB_REF#refs/tags/}
-          export VERSION_MINOR=$(echo ${VERSION} | awk '{match($0,"v[0-9].[0-9]",a)}END{print a[0]}')
-          export VERSION_MAJOR=$(echo ${VERSION} | awk '{match($0,"v[0-9]",a)}END{print a[0]}')
-          docker build --build-arg ACTION_VERSION=${VERSION} \
-          -t morphy/revive-action \
-          -t morphy/revive-action:${VERSION} \
-          -t morphy/revive-action:${VERSION_MINOR} \
-          -t morphy/revive-action:${VERSION_MAJOR} .
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: |
+            ${{ env.DOCKER_HUB_IMAGE }}
+            ${{ env.GHCR_IMAGE }}
+          tags: |
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=sha
 
-      - name: Publish image
-        run: docker push --all-tags morphy/revive-action
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
 
-      - name: Logout
-        run: docker logout
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          registry: index.docker.io
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract version
+        id: version
+        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+
+      - name: Build and push
+        id: push
+        uses: docker/build-push-action@v6
+        with:
+          platforms: linux/amd64,linux/arm64
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          build-args: ACTION_VERSION=${{ steps.version.outputs.version }}
+          push: true
+
+      - name: Generate artifact attestation
+        uses: actions/attest-build-provenance@v1
+        with:
+          subject-name: |
+            ${{ env.DOCKER_HUB_IMAGE }}
+            ${{ env.GHCR_IMAGE }}
+          subject-digest: ${{ steps.push.outputs.digest }}
+          push-to-registry: true
