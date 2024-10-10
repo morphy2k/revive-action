@@ -4,28 +4,37 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
 
 ## Usage
 
-Checkout
+### Checkout
 
 ```YAML
 - name: Check out code into the Go module directory
-  uses: actions/checkout@v2
+  uses: actions/checkout@v4
 ```
 
-Use by pulling pre-built image **(recommended)**
+### Use by pulling pre-built image **(recommended)**
+
+#### Docker Hub image
 
 ```YAML
 - name: Run Revive Action by pulling pre-built image
   uses: docker://morphy/revive-action:v2
 ```
 
-Use by building from repository
+#### GitHub Container registry image
+
+```YAML
+- name: Run Revive Action by pulling pre-built image
+  uses: docker://ghcr.io/morphy2k/revive-action:v2
+```
+
+### Use by building from repository
 
 ```YAML
 - name: Run Revive Action by building from repository
   uses: morphy2k/revive-action@v2
 ```
 
-Configuration
+### Configuration
 
 ```YAML
   with:
@@ -35,6 +44,35 @@ Configuration
     exclude: "file.go;foo/bar.go;./foo/bar/..."
     # Path pattern (default: ./...)
     path: "./foo/..."
+```
+
+### Workflow example
+
+```YAML
+name: Lint
+on:
+  pull_request:
+  push:
+    paths:
+      - '**.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'revive.toml'
+
+jobs:
+
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v4
+
+    - name: Run Revive Action
+      uses: docker://morphy/revive-action:v2
+      with:
+        config: revive.toml
 ```
 
 ## Screenshots
