@@ -5,7 +5,7 @@ on:
     types: [published]
 
 env:
-  DOCKER_HUB_IMAGE: index.docker.io/morphy/revive-action
+  DOCKER_HUB_IMAGE: docker.io/morphy/revive-action
   GHCR_IMAGE: ghcr.io/${{ github.repository }}
 
 jobs:
@@ -47,8 +47,8 @@ jobs:
       - name: Login to Docker Hub
         uses: docker/login-action@v3
         with:
-          registry: index.docker.io
-          username: ${{ secrets.DOCKER_USERNAME }}
+          registry: docker.io
+          username: ${{ vars.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Login to GitHub Container Registry
@@ -70,13 +70,12 @@ jobs:
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
           build-args: ACTION_VERSION=${{ steps.version.outputs.version }}
+          provenance: true
           push: true
 
       - name: Generate artifact attestation
         uses: actions/attest-build-provenance@v1
         with:
-          subject-name: |
-            ${{ env.DOCKER_HUB_IMAGE }}
-            ${{ env.GHCR_IMAGE }}
+          subject-name: ${{ env.GHCR_IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
           push-to-registry: true
