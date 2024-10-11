@@ -33,9 +33,9 @@ jobs:
             ${{ env.DOCKER_HUB_IMAGE }}
             ${{ env.GHCR_IMAGE }}
           tags: |
-            type=semver,pattern=v{{version}}
-            type=semver,pattern=v{{major}}.{{minor}}
-            type=semver,pattern=v{{major}}
+            type=semver,prefix=v,pattern={{version}}
+            type=semver,prefix=v,pattern={{major}}.{{minor}}
+            type=semver,prefix=v,pattern={{major}}
             type=sha
 
       - name: Set up QEMU
