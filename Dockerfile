@@ -19,7 +19,7 @@ LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
 LABEL maintainer="Markus Wiegand <mail@morphy.dev>"
 
-LABEL org.opencontainers.image.source = "https://github.com/morphy2k/revive-action"
+LABEL org.opencontainers.image.source="https://github.com/morphy2k/revive-action"
 LABEL org.opencontainers.image.description="GitHub Action that runs Revive on your Go code"
 LABEL org.opencontainers.image.licenses=MIT
 
