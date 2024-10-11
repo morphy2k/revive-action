@@ -60,7 +60,7 @@ jobs:
 
       - name: Extract version
         id: version
-        run: echo ::set-output name=version::${GITHUB_REF#refs/tags/}
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       - name: Build and push
         id: push
@@ -69,7 +69,7 @@ jobs:
           platforms: linux/amd64,linux/arm64
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          build-args: ACTION_VERSION=${{ steps.version.outputs.version }}
+          build-args: ACTION_VERSION=${{ steps.version.outputs.VERSION }}
           provenance: true
           push: true
 
