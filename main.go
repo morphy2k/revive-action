@@ -51,8 +51,8 @@ func getFailures(ch chan *failure) {
 }
 
 func printFailure(f *failure, wg *sync.WaitGroup) {
-	s := fmt.Sprintf("file=%s,line=%d,col=%d::%s\n",
-		f.Position.Start.Filename, f.Position.Start.Line, f.Position.Start.Column, f.Failure)
+	s := fmt.Sprintf("file=%s,line=%d,endLine=%d,col=%d,endColumn=%d::%s\n",
+		f.Position.Start.Filename, f.Position.Start.Line, f.Position.End.Line, f.Position.Start.Column, f.Position.End.Column, f.Failure)
 
 	if f.Severity == "warning" {
 		fmt.Printf("::warning %s", s)
