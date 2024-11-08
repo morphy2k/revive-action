@@ -3,64 +3,101 @@ package main
 
 import (
 	"encoding/json"
+	"errors"
 	"flag"
 	"fmt"
-	"go/token"
 	"os"
-	"sync"
+	"os/exec"
+	"strings"
 )
 
-var version = "unknown"
+const formatter = "ndjson"
 
-type failure struct {
-	Failure    string
-	RuleName   string
-	Category   string
-	Position   position
-	Confidence float64
-	Severity   string
-}
+var version = ""
 
-type position struct {
-	Start token.Position
-	End   token.Position
-}
+func runRevive(args []string) (*statistics, int, error) {
+	cmd := exec.Command("revive", args...)
 
-type statistics struct {
-	Total, Warnings, Errors int
-}
+	stdout, err := cmd.StdoutPipe()
+	if err != nil {
+		return nil, 0, fmt.Errorf("error while getting stdout pipe: %w", err)
+	}
+	defer stdout.Close()
 
-func (f statistics) String() string {
-	return fmt.Sprintf("%d failures (%d warnings, %d errors)",
-		f.Total, f.Warnings, f.Errors)
-}
+	if err := cmd.Start(); err != nil {
+		return nil, 0, fmt.Errorf("error while running revive: %w", err)
+	}
 
-func getFailures(ch chan *failure) {
-	dec := json.NewDecoder(os.Stdin)
+	dec := json.NewDecoder(stdout)
+
+	stats := &statistics{}
+
+	fmt.Println("::group::Failures")
 
 	for dec.More() {
 		f := &failure{}
 		if err := dec.Decode(f); err != nil {
-			fmt.Fprintln(os.Stderr, "Error while decoding stdin:", err)
-			os.Exit(1)
+			fmt.Println("::endgroup::")
+			return nil, 0, fmt.Errorf("error while decoding revive output: %w", err)
 		}
-		ch <- f
+
+		stats.Total++
+
+		switch f.Severity {
+		case "warning":
+			stats.Warnings++
+		case "error":
+			stats.Errors++
+		}
+
+		fmt.Println(f.Format())
 	}
 
-	close(ch)
+	fmt.Println("::endgroup::")
+
+	var exitErr *exec.ExitError
+	if err := cmd.Wait(); err != nil && !errors.As(err, &exitErr) {
+		return nil, 0, fmt.Errorf("error while waiting for revive: %w", err)
+	}
+
+	code := cmd.ProcessState.ExitCode()
+
+	return stats, code, nil
 }
 
-func printFailure(f *failure, wg *sync.WaitGroup) {
-	s := fmt.Sprintf("file=%s,line=%d,endLine=%d,col=%d,endColumn=%d::%s\n",
-		f.Position.Start.Filename, f.Position.Start.Line, f.Position.End.Line, f.Position.Start.Column, f.Position.End.Column, f.Failure)
+func getReviveVersion() (string, error) {
+	cmd := exec.Command("revive", "-version")
 
-	if f.Severity == "warning" {
-		fmt.Printf("::warning %s", s)
-	} else {
-		fmt.Printf("::error %s", s)
+	stdout, err := cmd.Output()
+	if err != nil {
+		return "", fmt.Errorf("error while getting revive version: %w", err)
 	}
 
-	wg.Done()
+	output := strings.TrimSpace(string(stdout))
+	parts := strings.Fields(output)
+	if len(parts) < 2 {
+		return "", fmt.Errorf("unexpected output format: %s", output)
+	}
+
+	version := parts[1]
+
+	return version, nil
+}
+
+func buildArgs(input *input) []string {
+	args := []string{"-formatter", formatter}
+
+	if input.config != "" {
+		args = append(args, "-config", input.config)
+	}
+
+	for _, path := range input.exclude {
+		args = append(args, "-exclude", path)
+	}
+
+	args = append(args, input.path)
+
+	return args
 }
 
 func main() {
@@ -72,33 +109,24 @@ func main() {
 		os.Exit(0)
 	}
 
-	stats := &statistics{}
+	input := parseInput()
+	args := buildArgs(input)
 
-	ch := make(chan *failure)
-	go getFailures(ch)
-
-	wg := &sync.WaitGroup{}
-
-	fmt.Println("::group::Failures")
-
-	for f := range ch {
-		wg.Add(1)
-
-		stats.Total++
-
-		switch f.Severity {
-		case "warning":
-			stats.Warnings++
-		case "error":
-			stats.Errors++
-		}
-
-		go printFailure(f, wg)
+	reviveVersion, err := getReviveVersion()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "::error %s", err)
+		os.Exit(1)
 	}
 
-	wg.Wait()
+	fmt.Printf("ACTION: %s\nREVIVE: %s\n", version, reviveVersion)
 
-	fmt.Println("::endgroup::")
+	stats, code, err := runRevive(args)
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "::error %s", err)
+		os.Exit(1)
+	}
 
 	fmt.Println("Successful run with", stats.String())
+
+	os.Exit(code)
 }

@@ -1,24 +1,25 @@
-FROM golang:1.23.3 AS build-env
+FROM --platform=$BUILDPLATFORM golang:1.23.3 AS build-env
 
-ARG ACTION_VERSION=unknown
-ARG REVIVE_VERSION=v1.5.0
+ARG VERSION
+
+ARG TARGETOS
+ARG TARGETARCH
 
 ENV CGO_ENABLED=0
 
-RUN go install -v -ldflags="-X 'github.com/mgechev/revive/cli.version=${REVIVE_VERSION}'" \
-    github.com/mgechev/revive@${REVIVE_VERSION}
-
-WORKDIR /tmp/github.com/morphy2k/revive-action
+WORKDIR /src
 COPY . .
 
-RUN go install -ldflags="-X 'main.version=${ACTION_VERSION}'"
+RUN GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -ldflags="-X 'main.version=${VERSION}'"
 
-FROM alpine:3.20.3
+FROM ghcr.io/mgechev/revive:1.5.0
 
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
 LABEL maintainer="Markus Wiegand <mail@morphy.dev>"
 
+LABEL org.opencontainers.image.title="Revive Action"
 LABEL org.opencontainers.image.source="https://github.com/morphy2k/revive-action"
 LABEL org.opencontainers.image.description="GitHub Action that runs Revive on your Go code"
 LABEL org.opencontainers.image.licenses=MIT
@@ -28,9 +29,6 @@ LABEL com.github.actions.description="GitHub Action that runs Revive on your Go 
 LABEL com.github.actions.icon="code"
 LABEL com.github.actions.color="blue"
 
-COPY --from=build-env ["/go/bin/revive", "/go/bin/revive-action", "/bin/"]
-COPY --from=build-env /tmp/github.com/morphy2k/revive-action/entrypoint.sh /
+COPY --from=build-env ["/src/revive-action", "/revive-action"]
 
-RUN apk add --no-cache bash gawk
-
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["/revive-action"]
