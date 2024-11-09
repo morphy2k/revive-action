@@ -40,8 +40,11 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
   with:
     # Path to your Revive config within the repo (optional)
     config: revive/config.toml
-    # Exclude patterns, separated by semicolons (optional)
-    exclude: "file.go;foo/bar.go;./foo/bar/..."
+    # Exclude patterns (optional)
+    exclude: |
+      file.go
+      foo/bar.go
+      ./foo/bar/...
     # Path pattern (default: ./...)
     path: "./foo/..."
 ```
