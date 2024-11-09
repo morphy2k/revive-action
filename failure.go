@@ -25,7 +25,9 @@ func (f *failure) Format() string {
 	}
 
 	fmt.Fprintf(&sb, "file=%s,line=%d,endLine=%d,col=%d,endColumn=%d::%s",
-		f.Position.Start.Filename, f.Position.Start.Line, f.Position.End.Line, f.Position.Start.Column, f.Position.End.Column, f.Failure)
+		f.Position.Start.Filename, f.Position.Start.Line,
+		f.Position.End.Line, f.Position.Start.Column,
+		f.Position.End.Column, f.Failure)
 
 	return sb.String()
 }
