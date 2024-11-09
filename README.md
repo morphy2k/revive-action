@@ -40,19 +40,25 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
   with:
     # Path to your Revive config within the repo (optional)
     config: revive/config.toml
+
     # Exclude patterns (optional)
     exclude: |
       file.go
       foo/bar.go
       ./foo/bar/...
+
     # Path pattern (default: ./...)
     path: "./foo/..."
+
+    # Fail on any issue. Overrides the error and warning code in config (default: false)
+    fail-on-any: true
 ```
 
 ### Workflow example
 
 ```YAML
 name: Lint
+
 on:
   pull_request:
   push:

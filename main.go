@@ -95,6 +95,10 @@ func buildArgs(input *input) []string {
 		args = append(args, "-exclude", path)
 	}
 
+	if input.failOnAny {
+		args = append(args, "-set_exit_status")
+	}
+
 	args = append(args, input.path)
 
 	return args
@@ -109,7 +113,12 @@ func main() {
 		os.Exit(0)
 	}
 
-	input := parseInput()
+	input, err := parseInput()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "::error %s", err)
+		os.Exit(1)
+	}
+
 	args := buildArgs(input)
 
 	reviveVersion, err := getReviveVersion()
