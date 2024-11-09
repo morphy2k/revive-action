@@ -9,7 +9,7 @@ inputs:
         description: "Path of the Revive config file"
         required: false
     exclude:
-        description: "Revive exclude patterns, separated by semicolons"
+        description: "Revive exclude patterns, separated by newline"
         required: false
     path:
         description: "Revive path pattern"
