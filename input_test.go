@@ -25,10 +25,10 @@ func TestParseInput(t *testing.T) {
 		{
 			name: "with semicolon separated excludes",
 			env: map[string]string{
-				"INPUT_EXCLUDE": "dir1;dir2;dir3",
+				"INPUT_EXCLUDE": "dir1;./dir2/...;dir3/dir4/...",
 			},
 			expected: &input{
-				exclude: []string{"dir1", "dir2", "dir3"},
+				exclude: []string{"dir1", "./dir2/...", "dir3/dir4/..."},
 				path:    defaultPath,
 				config:  "",
 			},
@@ -36,10 +36,10 @@ func TestParseInput(t *testing.T) {
 		{
 			name: "with newline separated excludes",
 			env: map[string]string{
-				"INPUT_EXCLUDE": "dir1\ndir2\ndir3",
+				"INPUT_EXCLUDE": "dir1\n./dir2/...\ndir3/dir4/...",
 			},
 			expected: &input{
-				exclude: []string{"dir1", "dir2", "dir3"},
+				exclude: []string{"dir1", "./dir2/...", "dir3/dir4/..."},
 				path:    defaultPath,
 				config:  "",
 			},
@@ -78,8 +78,8 @@ func TestParseInput(t *testing.T) {
 				os.Setenv(k, v)
 			}
 
-			result := parseInput()
-			assert.Equal(t, tt.expected, result)
+			got := parseInput()
+			assert.Equal(t, tt.expected, got)
 		})
 	}
 }
