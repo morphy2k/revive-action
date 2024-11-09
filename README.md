@@ -11,7 +11,7 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
   uses: actions/checkout@v4
 ```
 
-### Use by pulling pre-built image **(recommended)**
+### Use by pulling pre-built image
 
 #### Docker Hub image
 
@@ -28,6 +28,11 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
 ```
 
 ### Use by building from repository
+
+> [!NOTE]
+> **Using a pre-built image is recommended.**
+>
+> It is more resource-efficient and has a shorter execution time.
 
 ```YAML
 - name: Run Revive Action by building from repository
