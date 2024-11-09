@@ -9,88 +9,77 @@ import (
 
 func TestParseInput(t *testing.T) {
 	tests := []struct {
-		name    string
-		envVars map[string]string
-		want    *input
+		name     string
+		env      map[string]string
+		expected *input
 	}{
 		{
-			name:    "default values",
-			envVars: map[string]string{},
-			want: &input{
-				exclude: []string{},
-				config:  "",
+			name: "default values",
+			env:  map[string]string{},
+			expected: &input{
+				exclude: make([]string, 0),
 				path:    defaultPath,
-			},
-		},
-		{
-			name: "exclude with single value",
-			envVars: map[string]string{
-				"INPUT_EXCLUDE": "test",
-			},
-			want: &input{
-				exclude: []string{"test"},
 				config:  "",
-				path:    defaultPath,
 			},
 		},
 		{
-			name: "exclude with multiple values",
-			envVars: map[string]string{
-				"INPUT_EXCLUDE": "test1;test2;test3",
+			name: "with semicolon separated excludes",
+			env: map[string]string{
+				"INPUT_EXCLUDE": "dir1;dir2;dir3",
 			},
-			want: &input{
-				exclude: []string{"test1", "test2", "test3"},
+			expected: &input{
+				exclude: []string{"dir1", "dir2", "dir3"},
+				path:    defaultPath,
 				config:  "",
-				path:    defaultPath,
 			},
 		},
 		{
-			name: "config with value",
-			envVars: map[string]string{
-				"INPUT_CONFIG": "config.yaml",
+			name: "with newline separated excludes",
+			env: map[string]string{
+				"INPUT_EXCLUDE": "dir1\ndir2\ndir3",
 			},
-			want: &input{
-				exclude: []string{},
-				config:  "config.yaml",
+			expected: &input{
+				exclude: []string{"dir1", "dir2", "dir3"},
 				path:    defaultPath,
-			},
-		},
-		{
-			name: "custom path",
-			envVars: map[string]string{
-				"INPUT_PATH": "./custom",
-			},
-			want: &input{
-				exclude: []string{},
 				config:  "",
-				path:    "./custom",
 			},
 		},
 		{
-			name: "all values set",
-			envVars: map[string]string{
-				"INPUT_EXCLUDE": "test1;test2",
-				"INPUT_CONFIG":  "config.yaml",
-				"INPUT_PATH":    "./custom",
+			name: "with custom config",
+			env: map[string]string{
+				"INPUT_CONFIG": "custom.toml",
 			},
-			want: &input{
-				exclude: []string{"test1", "test2"},
-				config:  "config.yaml",
-				path:    "./custom",
+			expected: &input{
+				exclude: make([]string, 0),
+				path:    defaultPath,
+				config:  "custom.toml",
+			},
+		},
+		{
+			name: "with custom path",
+			env: map[string]string{
+				"INPUT_PATH": "./src/...",
+			},
+			expected: &input{
+				exclude: make([]string, 0),
+				path:    "./src/...",
+				config:  "",
 			},
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			// Clear environment before each test
 			os.Clearenv()
-			for k, v := range tt.envVars {
+
+			// Set up test environment
+			for k, v := range tt.env {
 				os.Setenv(k, v)
 			}
-			defer os.Clearenv()
 
-			got := parseInput()
-			assert.Equal(t, tt.want, got)
+			result := parseInput()
+			assert.Equal(t, tt.expected, result)
 		})
 	}
 }

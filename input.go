@@ -22,7 +22,12 @@ func parseInput() *input {
 	}
 
 	if v, ok := os.LookupEnv("INPUT_EXCLUDE"); ok {
-		input.exclude = strings.Split(v, ";")
+		switch {
+		case strings.Contains(v, ";"):
+			input.exclude = strings.Split(v, ";")
+		default:
+			input.exclude = strings.Split(v, "\n")
+		}
 	}
 
 	if v, ok := os.LookupEnv("INPUT_CONFIG"); ok {
