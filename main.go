@@ -11,12 +11,15 @@ import (
 	"strings"
 )
 
-const formatter = "ndjson"
+const (
+	revivePath = "/revive"
+	formatter  = "ndjson"
+)
 
 var version = ""
 
 func runRevive(args []string) (*statistics, int, error) {
-	cmd := exec.Command("revive", args...)
+	cmd := exec.Command(revivePath, args...)
 
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -66,7 +69,7 @@ func runRevive(args []string) (*statistics, int, error) {
 }
 
 func getReviveVersion() (string, error) {
-	cmd := exec.Command("revive", "-version")
+	cmd := exec.Command(revivePath, "-version")
 
 	stdout, err := cmd.Output()
 	if err != nil {
