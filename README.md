@@ -27,12 +27,10 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
   uses: docker://ghcr.io/morphy2k/revive-action:v2
 ```
 
-### Use by building from repository
-
 > [!NOTE]
-> **Using a pre-built image is recommended.**
->
-> It is more resource-efficient and has a shorter execution time.
+> Using a pre-built image is more resource-efficient and has a shorter execution time.
+
+### Use by building from repository
 
 ```YAML
 - name: Run Revive Action by building from repository
@@ -44,16 +42,16 @@ This Action runs [Revive](https://github.com/mgechev/revive) on your [Go](https:
 ```YAML
   with:
     # Path to your Revive config within the repo (optional)
-    config: revive/config.toml
+    config: revive.toml
 
-    # Exclude patterns (optional)
+    # Exclude patterns (default: vendor/...)
     exclude: |
       file.go
       foo/bar.go
       ./foo/bar/...
 
     # Path pattern (default: ./...)
-    path: "./foo/..."
+    path: ./foo/...
 
     # Fail on any issue. Overrides the error and warning code in config (default: false)
     fail-on-any: true
