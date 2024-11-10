@@ -40,3 +40,19 @@ func (s statistics) String() string {
 	return fmt.Sprintf("%d failures (%d warnings, %d errors)",
 		s.Total, s.Warnings, s.Errors)
 }
+
+func (s statistics) ToMarkdownTable() string {
+	return fmt.Sprintf(`
+### Revive Summary
+
+| Category | Count |
+|:---------|------:|
+| ⚠️ Warnings | %d |
+| ❌ Errors | %d |
+| Total | %d |
+`,
+		s.Warnings,
+		s.Errors,
+		s.Total,
+	)
+}

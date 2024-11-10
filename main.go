@@ -107,6 +107,25 @@ func buildArgs(input *input) []string {
 	return args
 }
 
+func writeSummary(stats *statistics) error {
+	path, ok := os.LookupEnv("GITHUB_STEP_SUMMARY")
+	if !ok {
+		return fmt.Errorf("GITHUB_STEP_SUMMARY not set")
+	}
+
+	f, err := os.OpenFile(path, os.O_APPEND|os.O_WRONLY, 0644)
+	if err != nil {
+		return fmt.Errorf("failed to open summary file: %w", err)
+	}
+	defer f.Close()
+
+	if _, err := f.WriteString(stats.ToMarkdownTable()); err != nil {
+		return fmt.Errorf("failed to write summary: %w", err)
+	}
+
+	return nil
+}
+
 func main() {
 	printVersion := flag.Bool("version", false, "Print version")
 	flag.Parse()
@@ -139,6 +158,15 @@ func main() {
 	}
 
 	fmt.Println("Successful run with", stats.String())
+
+	if v := os.Getenv("GITHUB_ACTIONS"); v == "true" {
+		if err := writeSummary(stats); err != nil {
+			fmt.Fprintf(os.Stderr, "::error %s", err)
+			os.Exit(1)
+		}
+	} else {
+		fmt.Println("Running outside of GitHub Actions, skipping summary")
+	}
 
 	os.Exit(code)
 }
