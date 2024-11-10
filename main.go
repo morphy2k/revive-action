@@ -126,6 +126,11 @@ func writeSummary(stats *statistics) error {
 	return nil
 }
 
+func handleError(err error) {
+	fmt.Fprintf(os.Stderr, "::error %s", err)
+	os.Exit(1)
+}
+
 func main() {
 	printVersion := flag.Bool("version", false, "Print version")
 	flag.Parse()
@@ -137,32 +142,28 @@ func main() {
 
 	input, err := parseInput()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "::error %s", err)
-		os.Exit(1)
+		handleError(err)
 	}
 
 	args := buildArgs(input)
 
 	reviveVersion, err := getReviveVersion()
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "::error %s", err)
-		os.Exit(1)
+		handleError(err)
 	}
 
 	fmt.Printf("ACTION: %s\nREVIVE: %s\n", version, reviveVersion)
 
 	stats, code, err := runRevive(args)
 	if err != nil {
-		fmt.Fprintf(os.Stderr, "::error %s", err)
-		os.Exit(1)
+		handleError(err)
 	}
 
 	fmt.Println("Successful run with", stats.String())
 
 	if v := os.Getenv("GITHUB_ACTIONS"); v == "true" {
 		if err := writeSummary(stats); err != nil {
-			fmt.Fprintf(os.Stderr, "::error %s", err)
-			os.Exit(1)
+			handleError(err)
 		}
 	} else {
 		fmt.Println("Running outside of GitHub Actions, skipping summary")
