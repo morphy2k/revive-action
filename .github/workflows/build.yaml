@@ -71,7 +71,7 @@ jobs:
           push: true
 
       - name: Generate artifact attestation
-        uses: actions/attest-build-provenance@v1
+        uses: actions/attest-build-provenance@v2
         with:
           subject-name: ${{ env.GHCR_IMAGE }}
           subject-digest: ${{ steps.push.outputs.digest }}
