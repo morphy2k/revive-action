@@ -52,7 +52,7 @@ func parseInput() (*input, error) {
 }
 
 func (i *input) parseExclude() error {
-	if v, ok := os.LookupEnv(envExclude); ok && v != "" {
+	if v := os.Getenv(envExclude); v != "" {
 		switch {
 		case strings.Contains(v, ";"):
 			i.exclude = strings.Split(v, ";")
@@ -65,7 +65,7 @@ func (i *input) parseExclude() error {
 }
 
 func (i *input) parseConfig() error {
-	if v, ok := os.LookupEnv(envConfig); ok {
+	if v := os.Getenv(envConfig); v != "" {
 		i.config = v
 	}
 
@@ -73,7 +73,7 @@ func (i *input) parseConfig() error {
 }
 
 func (i *input) parsePath() error {
-	if v, ok := os.LookupEnv(envPath); ok {
+	if v := os.Getenv(envPath); v != "" {
 		i.path = v
 	}
 
@@ -81,7 +81,7 @@ func (i *input) parsePath() error {
 }
 
 func (i *input) parseFailOnAny() error {
-	if v, ok := os.LookupEnv(envFailOnAny); ok {
+	if v := os.Getenv(envFailOnAny); v != "" {
 		b, err := strconv.ParseBool(v)
 		if err != nil {
 			return fmt.Errorf("invalid value: %w", err)
