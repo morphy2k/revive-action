@@ -12,7 +12,7 @@ const (
 	envExclude   = "INPUT_EXCLUDE"
 	envConfig    = "INPUT_CONFIG"
 	envPath      = "INPUT_PATH"
-	envFailOnAny = "INPUT_FAIL_ON_ANY"
+	envFailOnAny = "INPUT_FAIL-ON-ANY"
 
 	// Default path
 	defaultPath = "./..."
