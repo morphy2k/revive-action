@@ -20,5 +20,3 @@ inputs:
 runs:
     using: "docker"
     image: "Dockerfile"
-    env:
-        INPUT_FAIL_ON_ANY: ${{ inputs.fail-on-any }} # Map input to POSIX compliant variable
