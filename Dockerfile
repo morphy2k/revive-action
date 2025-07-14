@@ -13,7 +13,7 @@ COPY . .
 RUN GOOS=$TARGETOS GOARCH=$TARGETARCH \
     go build -ldflags="-X 'main.version=${VERSION}'"
 
-FROM ghcr.io/mgechev/revive:1.10.0
+FROM ghcr.io/mgechev/revive:1.11.0
 
 LABEL repository="https://github.com/morphy2k/revive-action"
 LABEL homepage="https://github.com/morphy2k/revive-action"
