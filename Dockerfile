@@ -1,4 +1,4 @@
-FROM --platform=$BUILDPLATFORM golang:1.25.0 AS build-env
+FROM --platform=$BUILDPLATFORM golang:1.25.3 AS build-env
 
 ARG VERSION
 
